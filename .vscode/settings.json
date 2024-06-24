@@ -1,0 +1,5 @@
+{
+    "files.autoSave": "afterDelay",
+    "python.REPL.enableREPLSmartSend": false,
+    "search.useGlobalIgnoreFiles": false
+}
