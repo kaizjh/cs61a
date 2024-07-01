@@ -1,4 +1,6 @@
-"""CS 61A presents Ants Vs. SomeBees."""
+"""CS 61A presents Ants Vs. SomeBees.
+    A game like Plants Vs. Zombies.
+"""
 
 import random
 from ucb import main, interact, trace
@@ -27,6 +29,8 @@ class Place:
         # Phase 1: Add an entrance to the exit
         # BEGIN Problem 2
         "*** YOUR CODE HERE ***"
+        if exit:
+            exit.entrance = self
         # END Problem 2
 
     def add_insect(self, insect):
@@ -143,6 +147,7 @@ class HarvesterAnt(Ant):
     name = 'Harvester'
     implemented = True
     # OVERRIDE CLASS ATTRIBUTES HERE
+    food_cost = 2
 
     def action(self, gamestate):
         """Produce 1 additional food for the colony.
@@ -151,6 +156,7 @@ class HarvesterAnt(Ant):
         """
         # BEGIN Problem 1
         "*** YOUR CODE HERE ***"
+        gamestate.food += 1
         # END Problem 1
 
 
@@ -161,6 +167,7 @@ class ThrowerAnt(Ant):
     implemented = True
     damage = 1
     # ADD/OVERRIDE CLASS ATTRIBUTES HERE
+    food_cost = 3
 
     def nearest_bee(self):
         """Return the nearest Bee in a Place (that is not the hive) connected to
@@ -169,7 +176,18 @@ class ThrowerAnt(Ant):
         This method returns None if there is no such Bee (or none in range).
         """
         # BEGIN Problem 3 and 4
-        return random_bee(self.place.bees) # REPLACE THIS LINE
+        # return random_bee(self.place.bees) # REPLACE THIS LINE
+        if self.place.bees:
+            return random_bee(self.place.bees)
+        else:
+            place = self.place.entrance
+            while True:
+                if place.is_hive:
+                    return None
+                elif place.bees:
+                    return random_bee(place.bees)
+                else:
+                    place = place.entrance
         # END Problem 3 and 4
 
     def throw_at(self, target):
@@ -201,7 +219,19 @@ class ShortThrower(ThrowerAnt):
     food_cost = 2
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 4
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
+    upper_bound = 3
+    
+    def nearest_bee(self):
+        place = self.place
+        count = 0
+        while True:
+            if count > self.upper_bound or place.is_hive:
+                return None
+            elif place.bees:
+                return random_bee(place.bees)
+            place = place.entrance
+            count += 1
     # END Problem 4
 
 
@@ -212,7 +242,21 @@ class LongThrower(ThrowerAnt):
     food_cost = 2
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 4
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
+    lower_bound = 5
+    
+    def nearest_bee(self):
+        place = self.place
+        count = 1
+        while True:
+            place = place.entrance
+            if place.is_hive:
+                return None
+            elif count < self.lower_bound:
+                count += 1
+                continue
+            elif place.bees:
+                return random_bee(place.bees)
     # END Problem 4
 
 
