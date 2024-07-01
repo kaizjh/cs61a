@@ -168,6 +168,8 @@ class ThrowerAnt(Ant):
     damage = 1
     # ADD/OVERRIDE CLASS ATTRIBUTES HERE
     food_cost = 3
+    upper_bound = float('inf')
+    lower_bound = 0
 
     def nearest_bee(self):
         """Return the nearest Bee in a Place (that is not the hive) connected to
@@ -177,17 +179,19 @@ class ThrowerAnt(Ant):
         """
         # BEGIN Problem 3 and 4
         # return random_bee(self.place.bees) # REPLACE THIS LINE
-        if self.place.bees:
-            return random_bee(self.place.bees)
-        else:
-            place = self.place.entrance
-            while True:
-                if place.is_hive:
-                    return None
-                elif place.bees:
-                    return random_bee(place.bees)
-                else:
-                    place = place.entrance
+        place = self.place
+        count = 0
+        while True:
+            if count > self.upper_bound or place.is_hive:
+                return None
+            elif count < self.lower_bound:
+                place = place.entrance
+                count += 1
+                continue
+            elif place.bees:
+                return random_bee(place.bees)
+            place = place.entrance
+            count += 1
         # END Problem 3 and 4
 
     def throw_at(self, target):
@@ -221,17 +225,6 @@ class ShortThrower(ThrowerAnt):
     # BEGIN Problem 4
     implemented = True   # Change to True to view in the GUI
     upper_bound = 3
-    
-    def nearest_bee(self):
-        place = self.place
-        count = 0
-        while True:
-            if count > self.upper_bound or place.is_hive:
-                return None
-            elif place.bees:
-                return random_bee(place.bees)
-            place = place.entrance
-            count += 1
     # END Problem 4
 
 
@@ -244,24 +237,18 @@ class LongThrower(ThrowerAnt):
     # BEGIN Problem 4
     implemented = True   # Change to True to view in the GUI
     lower_bound = 5
-    
-    def nearest_bee(self):
-        place = self.place
-        count = 1
-        while True:
-            place = place.entrance
-            if place.is_hive:
-                return None
-            elif count < self.lower_bound:
-                count += 1
-                continue
-            elif place.bees:
-                return random_bee(place.bees)
     # END Problem 4
 
 
 class FireAnt(Ant):
-    """FireAnt cooks any Bee in its Place when it expires."""
+    """FireAnt cooks any Bee in its Place when it expires.
+     
+     If it dies, it does an additional amount of damage,
+     as specified by its damage attribute, 
+     which has a default value of 3 as defined in the FireAnt class.
+     
+     This dying damage is also to all bees in the place.
+    """
 
     name = 'Fire'
     damage = 3
@@ -284,6 +271,16 @@ class FireAnt(Ant):
         """
         # BEGIN Problem 5
         "*** YOUR CODE HERE ***"
+        new_bees = list(self.place.bees) # Create a new list to record the changing of the bees
+        for bee in self.place.bees:
+            if self.health <= amount:
+                bee.reduce_health(amount + self.damage) # If FireAnt is goning to die, increase the amount
+            else:
+                bee.reduce_health(amount)
+            if bee.health <= 0:
+                    new_bees.remove(bee) # Every time a bee dies, refresh the new list
+        self.place.bees = new_bees
+        Ant.reduce_health(self, amount) # Refresh the state of FireAnt at the end, using the reduce_health from parent class, not recursion
         # END Problem 5
 
 # BEGIN Problem 6
