@@ -319,4 +319,11 @@ class ChangeMachine:
 
             return changes
         else:
-            return [coin]
+            return [coin]        
+        # Alternate solution
+        self.coins[coin] = 1 + self.coins.get(coin, 0)  # Put the coin in the machine
+        result = make_change(coin, self.coins)
+        for c in result:
+            self.coins = remove_one(self.coins, c)
+        return result
+ 
