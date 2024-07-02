@@ -103,8 +103,9 @@ class Ant(Insect):
     implemented = False  # Only implemented Ant classes should be instantiated
     food_cost = 0
     is_container = False
-    damage_doubled = False
     # ADD CLASS ATTRIBUTES HERE
+    damage_doubled = False
+    blocks_path = True
 
     def __init__(self, health=1):
         super().__init__(health)
@@ -147,7 +148,7 @@ class Ant(Insect):
         # BEGIN Problem 12
         "*** YOUR CODE HERE ***"
         if not self.damage_doubled:
-            self.damage *= self.damage
+            self.damage = self.damage * 2
             self.damage_doubled = True
         # END Problem 12
 
@@ -282,13 +283,13 @@ class FireAnt(Ant):
         """
         # BEGIN Problem 5
         "*** YOUR CODE HERE ***"
-        bees = list(self.place.bees) # >>> bees is not self.place.bees # True
-        for bee in bees:
+        new_bees = list(self.place.bees) # >>> bees is not self.place.bees # True
+        for bee in new_bees:
             if amount >= self.health:
                 bee.reduce_health(amount + self.damage)
             else:
                 bee.reduce_health(amount)
-        self.place.bees = [bee for bee in bees if bee.health > 0]
+        self.place.bees = [bee for bee in new_bees if bee.health > 0]
         Ant.reduce_health(self, amount) # Call the reduce_health() in parent class, not recursion
         # END Problem 5
 
@@ -446,7 +447,7 @@ class QueenAnt(ThrowerAnt):
     food_cost = 7
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 12
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem 12
 
     def action(self, gamestate):
@@ -464,7 +465,10 @@ class QueenAnt(ThrowerAnt):
             elif place.ant:
                 place.ant.double() # If it is a ant, then it must double()
                 if place.ant.is_container:
-                    place.ant.ant_contained.double()
+                    try:
+                        place.ant.ant_contained.double()
+                    except AttributeError:
+                        pass
         # END Problem 12
 
     def reduce_health(self, amount):
@@ -494,6 +498,7 @@ class NinjaAnt(Ant):
     damage = 1
     food_cost = 5
     # OVERRIDE CLASS ATTRIBUTES HERE
+    blocks_path = False
     # BEGIN Problem Optional 1
     implemented = False   # Change to True to view in the GUI
     # END Problem Optional 1
@@ -501,6 +506,11 @@ class NinjaAnt(Ant):
     def action(self, gamestate):
         # BEGIN Problem Optional 1
         "*** YOUR CODE HERE ***"
+        if self.place.bees:
+            new_bees = list(self.place.bees)
+            for bee in new_bees:
+                bee.reduce_health(self.damage)
+            self.place.bees = [bee for bee in new_bees if bee.health > 0]
         # END Problem Optional 1
 
 ############
@@ -565,7 +575,11 @@ class Bee(Insect):
         """Return True if this Bee cannot advance to the next Place."""
         # Special handling for NinjaAnt
         # BEGIN Problem Optional 1
-        return self.place.ant is not None
+        # Only when there is an ant and it blocks the path, return True
+        if self.place.ant:
+            if self.place.ant.blocks_path:
+                return True
+        return False
         # END Problem Optional 1
 
     def action(self, gamestate):
