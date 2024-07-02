@@ -255,7 +255,7 @@ class FireAnt(Ant):
     food_cost = 5
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 5
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem 5
 
     def __init__(self, health=3):
@@ -271,24 +271,52 @@ class FireAnt(Ant):
         """
         # BEGIN Problem 5
         "*** YOUR CODE HERE ***"
-        new_bees = list(self.place.bees) # Create a new list to record the changing of the bees
-        for bee in self.place.bees:
-            if self.health <= amount:
-                bee.reduce_health(amount + self.damage) # If FireAnt is goning to die, increase the amount
+        bees1 = list(self.place.bees)
+        for bee in bees1:
+            if amount >= self.health:
+                bee.reduce_health(amount + self.damage)
             else:
                 bee.reduce_health(amount)
-            if bee.health <= 0:
-                    new_bees.remove(bee) # Every time a bee dies, refresh the new list
-        self.place.bees = new_bees
-        Ant.reduce_health(self, amount) # Refresh the state of FireAnt at the end, using the reduce_health from parent class, not recursion
+        self.place.bees = [bee for bee in bees1 if bee.health > 0]
+        Ant.reduce_health(self, amount)
         # END Problem 5
 
 # BEGIN Problem 6
 # The WallAnt class
+class WallAnt(Ant):
+    """WallAnt does nothing, but defends our glorious home base!"""
+
+    name = 'Wall'
+    food_cost = 4
+    implemented = True
+
+    def __init__(self, health=4):
+        super().__init__(health)
 # END Problem 6
 
 # BEGIN Problem 7
 # The HungryAnt Class
+class HungryAnt(Ant):
+    """HungryAnt will eat a random Bee in its Place, after that, it takes 3 turns for HungryAnt to chew."""
+
+    name = 'Hungry'
+    food_cost = 4
+    chewing_turns = 3
+    implemented = True
+
+    def __init__(self, health=1):
+        super().__init__(health)
+        self.turns_to_chew = 0
+
+    def action(self, gamestate):
+        """Eat a random Bee in its place, if it is not chewing."""
+        if self.turns_to_chew == 0:
+            bee = random_bee(self.place.bees)
+            if bee:
+                bee.reduce_health(bee.health)
+                self.turns_to_chew = self.chewing_turns
+        else:
+            self.turns_to_chew -= 1        
 # END Problem 7
 
 
@@ -305,11 +333,16 @@ class ContainerAnt(Ant):
     def can_contain(self, other):
         # BEGIN Problem 8a
         "*** YOUR CODE HERE ***"
+        if self.ant_contained == None and other.is_container == False:
+            return True
+        else:
+            return False
         # END Problem 8a
 
     def store_ant(self, ant):
         # BEGIN Problem 8a
         "*** YOUR CODE HERE ***"
+        self.ant_contained = ant
         # END Problem 8a
 
     def remove_ant(self, ant):
@@ -330,6 +363,8 @@ class ContainerAnt(Ant):
     def action(self, gamestate):
         # BEGIN Problem 8a
         "*** YOUR CODE HERE ***"
+        if self.ant_contained:
+            self.ant_contained.action(gamestate)
         # END Problem 8a
 
 
@@ -340,7 +375,7 @@ class BodyguardAnt(ContainerAnt):
     food_cost = 4
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 8c
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem 8c
 
 # BEGIN Problem 9
