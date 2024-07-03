@@ -124,6 +124,9 @@ class Ant(Insect):
             place.ant = self
         else:
             # BEGIN Problem 8b
+            # After add_to(), if there are two ants (a container and a non-container),
+            # There should goes: place.ant->container, container.place->place, non-container->place
+            # I think.
             if self.can_contain(place.ant):
                 self.store_ant(place.ant)
                 place.ant = self
@@ -524,8 +527,9 @@ class LaserAnt(ThrowerAnt):
     name = 'Laser'
     food_cost = 10
     # OVERRIDE CLASS ATTRIBUTES HERE
+    damage = 2
     # BEGIN Problem Optional 2
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem Optional 2
 
     def __init__(self, health=1):
@@ -534,12 +538,36 @@ class LaserAnt(ThrowerAnt):
 
     def insects_in_front(self):
         # BEGIN Problem Optional 2
-        return {}
+        insect, distance = {}, 0
+        place = self.place
+        print(place)
+        
+        # Base case, LaserAnt's place
+        if place.ant.is_container:
+            insect[place.ant] = distance
+        if place.bees:
+            print(place, place.bees)
+            for bee in place.bees:
+                insect[bee] = distance
+        # From next place all along to the hive
+        while True:
+            place = place.entrance
+            distance += 1
+            if place.is_hive:
+                break
+            else:
+                if place.bees:
+                    for bee in place.bees:
+                        insect[bee] = distance
+
+                if place.ant:
+                    insect[place.ant] = distance
+        return insect
         # END Problem Optional 2
 
     def calculate_damage(self, distance):
         # BEGIN Problem Optional 2
-        return 0
+        return self.damage - (0.0625 * self.insects_shot) - (0.25 * distance)
         # END Problem Optional 2
 
     def action(self, gamestate):
