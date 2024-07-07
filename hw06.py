@@ -92,9 +92,10 @@ def store_digits(n):
     >>> cleaned = re.sub(r"#.*\\n", '', re.sub(r'"{3}[\s\S]*?"{3}', '', inspect.getsource(store_digits)))
     >>> print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None
     """
-    "*** YOUR CODE HERE ***"    
-    if n < 10:
-        return f'Link({n})'
-    else:
-        list = store_digits(n // 10)
-    return f'Link({n % 10}, {list})'
+    "*** YOUR CODE HERE ***"
+    result = f'Link({n % 10})'
+    n //= 10
+    while n > 0:
+        result = f'Link({n % 10}, {result})'
+        n //= 10
+    return result

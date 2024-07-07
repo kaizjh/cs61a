@@ -540,13 +540,11 @@ class LaserAnt(ThrowerAnt):
         # BEGIN Problem Optional 2
         insect, distance = {}, 0
         place = self.place
-        print(place)
         
         # Base case, LaserAnt's place
         if place.ant.is_container:
             insect[place.ant] = distance
         if place.bees:
-            print(place, place.bees)
             for bee in place.bees:
                 insect[bee] = distance
         # From next place all along to the hive

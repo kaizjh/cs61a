@@ -237,6 +237,117 @@ class C(B):
     def f(self, x):
         return x
 
-a = A()
-b = B(1)
-b.n = 5
+
+
+
+# L22 Composition
+class Link:
+    """A linked list with a first element and the rest."""
+    empty = ()
+    def __init__(self, first, rest=empty):
+        assert rest is Link.empty or isinstance(rest, Link)
+        self.first = first
+        self.rest = rest
+    def __getitem__(self, i):
+        if i == 0:
+            return self.first
+        else:
+            return self.rest[i-1] # Or: return self.rest.__getitem__(i - 1)
+    def __len__(self):
+        return 1 + len(self.rest)
+
+def add(s, v):
+    assert s is not Link.empty
+    if s.first > v:
+        s.first, s.rest = v, s
+    elif s.first < v and empty(s.rest):
+        s.rest = Link(v)
+    elif s.first < v:
+        s.rest = add(s.rest, v)
+    return s
+
+
+
+
+# Use data abstraction to define a tree and fib_tree, we have learned before
+def tree(label, branches=[]):
+    for branch in branches:
+        assert is_tree(branch)
+    return [label] + list(branches)
+
+def label(tree):
+    return tree [0]
+
+def branches(tree):
+    return tree [1:]
+
+def fib_tree(n):
+    if n == 0 or n == 1:
+        return tree(n)
+    else:
+        left = fib_tree(n - 2)
+        right = fib_tree(n - 1)
+        fib_n = label(left) + label(right)
+        return tree(fib_n, [left, right])
+
+
+# Use object system to define a tree and fib_tree, there is something different between class Tree and def tree(), but def fib_tree() is almost the same.
+# And we can do lots of thing more convenient with object system, like __repr__ adn __str__(invoked by print()), etc.
+class Tree:
+    def __init__(self, label, branches=[]):
+        self.label = label
+        for branch in branches:
+            assert isinstance(branch, Tree)
+        self.branches = list(branches)
+    
+    def __repr__(self):
+        if self.branches:
+            branch_str = ', ' + repr(self.branches)
+        else:
+            branch_str = ''
+        return f'Tree({repr(self.label)}{branch_str})'
+    
+    def __str__(self):
+        return '\n'.join(self.indented())
+    
+    def indented(self):
+        lines = []
+        for b in self.branches:
+            for line in b.indented():
+                lines.append('  ' + line)
+        return [str(self.label)] + lines
+    
+    def is_leaf(self):
+        return not self.branches
+
+def fib_tree(n):
+    if n == 0 or n == 1:
+        return Tree(n)
+    else:
+        left = fib_tree(n - 2)
+        right = fib_tree(n - 1)
+        fib_n = left.label + right.label
+        return Tree(fib_n, [left, right])
+    
+def leaves(t):
+    """Return a list of leaf labels in Tree T."""
+    if t.is_leaf():
+        return [t.label]
+    else:
+        all_leaves = []
+        for b in t.branches:
+            all_leaves += leaves(b)
+        return all_leaves
+
+def height(t):
+    """Return the number of transitions in the longest path in T."""
+    if t.is_leaf():
+        return 0
+    else:
+        return 1 + max(height(b) for b in t.branches)
+    
+def prune(t, n):
+    """Prune all sub-trees whose label is n."""
+    t.branches = [b for b in t.branches if b.label != n]
+    for b in t.branches:
+        prune(b, n)
