@@ -248,11 +248,19 @@ class Link:
         assert rest is Link.empty or isinstance(rest, Link)
         self.first = first
         self.rest = rest
+    
     def __getitem__(self, i):
         if i == 0:
             return self.first
         else:
             return self.rest[i-1] # Or: return self.rest.__getitem__(i - 1)
+        
+    def __repr__(self):
+        if self.rest:
+            return f'Link({self.first}, {self.rest})'
+        else:
+            return f'Link({self.first})'
+        
     def __len__(self):
         return 1 + len(self.rest)
 
@@ -351,3 +359,202 @@ def prune(t, n):
     t.branches = [b for b in t.branches if b.label != n]
     for b in t.branches:
         prune(b, n)
+
+
+
+
+
+def similar(self, k, similarity):
+    "Return a list of the k most similar items to self, using SIMILARITY for comparison."
+    others = list(Restraurant.all)
+    others.remove(self)
+    return sorted(others, key=lambda r: -similarity(self, r))[:k]
+
+
+
+def fast_overlap(s, t):
+    """Return the overlap between sorted list s and sorted list t."""
+    i, j, count = 0, 0, 0
+    while i < len(s) and j < len(t):
+        if s[i] == t[j]:
+            count, i, j = count + 1, i + 1, j + 1
+        elif s[i] < t[j]:
+            i += 1
+        else:
+            j += 1
+        return count
+    
+
+
+
+def smallest_indices(s):
+    """
+    Return the indices of the element(s) in list S, which has(have) the smallest absolute value.
+    >>> smallest_indices([1, 2, 3, 4])
+    [0]
+    >>> smallest_indices([4, 1, 2, 3, 1, 4])
+    [1, 4]
+    >>> smallest_indices([-4, -1, 2, 1, 3, 2])
+    [1, 3]
+    """
+    smallest = abs(min(s, key=abs))
+    return [i for i in range(len(s)) if abs(s[i]) == smallest]
+    # Alternative solution:
+    smallest = abs(min(s, key=abs))
+    f = lambda i: abs(s[i]) == smallest
+    return list(filter(f, range(len(s))))
+
+def largest_adj_sum(s):
+    """
+    Return the sum of the largest adjacent pair of elements in list S.
+    >>> largest_adj_sum([1, 2, 3, 4])
+    7
+    >>> largest_adj_sum([-4, -1, 2, 3, 2, -4])
+    5
+    """
+    assert len(s) > 1
+    return max([s[i] + s[i - 1] for i in range(1, len(s))])
+    # Alternative solution:
+    return max([a + b for a, b in zip(s[:-1], s[1:])])
+
+def map_digit_elem(s):
+    """
+    Create a dictionary mapping each digit d to the lists of elements in s that end with d.
+    map_digit_elem([5, 8, 21, 13, 55, 89)
+    {1: [21], 3: [13], 5: [5, 55], 8: [8], 9: [89]}
+    """
+    return {d: [e for e in s if e % 10 == d] for d in set(e % 10 for e in s)}
+    # Alternative solution:
+    digits = [x % 10 for x in s]
+    return {d: [e for e in s if e % 10 == d] for d in digits}
+
+def equal_some_other(s):
+    """
+    Return True if there is some element e in s such that e is equal to some other element in s.
+    >>> equal_some_other([1, 2, 1, 4])
+    False
+    >>> equal_some_other([1, 2, 3, 3, 1, 2])
+    True
+    """
+    return all(s[i] in s[:i] + s[i+1:] for i in range(len(s)))
+
+
+
+
+# L25 Data Examples
+def ordered(s, key=lambda x: x):
+    """
+    Is Link s ordered?
+    >>> ordered(Link(1, Link(2, Link(3))))
+    True
+    >>> ordered(Link(1, Link(3, Link(2))))
+    False
+    >>> ordered(Link(1, Link(-3, Link(4))))
+    False
+    >>> ordered(Link(1, Link(-3, Link(4))), key=abs)
+    True
+    >>> ordered(Link(1, Link(4, Link(2))), key=abs)
+    False
+    """
+    if s is Link.empty or s.rest is Link.empty:
+        return True
+    elif key(s.first) > key(s.rest.first):
+        return False
+    else:
+        return ordered(s.rest, key)
+    
+
+
+
+def cumulative_mul(t):
+    """Mutates t so that each node's label becomes the product of its own
+    label and all labels in the corresponding subtree rooted at t.
+
+    >>> t = Tree(1, [Tree(3, [Tree(5)]), Tree(7)])
+    >>> cumulative_mul(t)
+    >>> t
+    Tree(105, [Tree(15, [Tree(5)]), Tree(7)])
+    >>> otherTree = Tree(2, [Tree(1, [Tree(3), Tree(4), Tree(5)]), Tree(6, [Tree(7)])])
+    >>> cumulative_mul(otherTree)
+    >>> otherTree
+    Tree(5040, [Tree(60, [Tree(3), Tree(4), Tree(5)]), Tree(42, [Tree(7)])])
+    """
+    "*** YOUR CODE HERE ***"
+    def helper(t):
+        if t.is_leaf():
+            return t.label
+        else:
+            for b in t.branches:
+                t.label =  t.label * helper(b)
+            return t.label
+    # helper(t) helps me use recursion to solve the problem with cumulative_mul return nothing
+    helper(t)
+    return None
+
+    # Alternative solution, better solution, no return, no base case
+    # Because t.branches is a list, and default=[], if b is a leaf, then for loop do nothing (b.branches=[])
+    for b in t.branches:
+        cumulative_mul(b)
+        t.label *= b.label
+
+
+def prune_small(t, n):
+    """Prune the tree mutatively, keeping only the n branches
+    of each node with the smallest labels.
+
+    >>> t1 = Tree(6)
+    >>> prune_small(t1, 2)
+    >>> t1
+    Tree(6)
+    >>> t2 = Tree(6, [Tree(3), Tree(4)])
+    >>> prune_small(t2, 1)
+    >>> t2
+    Tree(6, [Tree(3)])
+    >>> t3 = Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2), Tree(3)]), Tree(5, [Tree(3), Tree(4)])])
+    >>> prune_small(t3, 2)
+    >>> t3
+    Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2)])])
+    >>> t4 = Tree(6, [Tree(1), Tree(5, [Tree(1), Tree(2), Tree(3)]), Tree(3, [Tree(3), Tree(4), Tree(2)])])
+    >>> prune_small(t4, 2)
+    >>> t4
+    Tree(6, [Tree(1), Tree(3, [Tree(2), Tree(3)])])
+    """
+    if len(t.branches) > n:
+        t.branches = sorted(t.branches, key=lambda x: x.label)[:n]
+    for b in t.branches:
+        prune_small(b, n)
+
+
+def delete(t, x):
+    """Remove all nodes labeled x below the root within Tree t. When a non-leaf
+    node is deleted, the deleted node's children become children of its parent.
+
+    The root node will never be removed.
+
+    >>> t = Tree(3, [Tree(2, [Tree(2), Tree(2)]), Tree(2), Tree(2, [Tree(2, [Tree(2), Tree(2)])])])
+    >>> delete(t, 2)
+    >>> t
+    Tree(3)
+    >>> t = Tree(1, [Tree(2, [Tree(4, [Tree(2)]), Tree(5)]), Tree(3, [Tree(6), Tree(2)]), Tree(4)])
+    >>> delete(t, 2)
+    >>> t
+    Tree(1, [Tree(4), Tree(5), Tree(3, [Tree(6)]), Tree(4)])
+    >>> t = Tree(1, [Tree(2, [Tree(4), Tree(5)]), Tree(3, [Tree(6), Tree(2)]), Tree(2, [Tree(6),  Tree(2), Tree(7), Tree(8)]), Tree(4)])
+    >>> delete(t, 2)
+    >>> t
+    Tree(1, [Tree(4), Tree(5), Tree(3, [Tree(6)]), Tree(6), Tree(7), Tree(8), Tree(4)])
+    """
+    new_branches = []
+    for b in t.branches:
+        delete(b, x)
+        if b.label == x:
+            new_branches.extend(b.branches)
+        else:
+            new_branches.append(b)
+    t.branches = new_branches
+
+t = Tree(1, [Tree(3, [Tree(6), Tree(2)]), Tree(4)])
+delete(t, 2)
+
+
+
