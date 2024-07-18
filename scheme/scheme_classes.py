@@ -27,32 +27,38 @@ class Frame:
         """Define Scheme SYMBOL to have VALUE."""
         # BEGIN PROBLEM 1
         "*** YOUR CODE HERE ***"
+        self.bindings[symbol] = value
         # END PROBLEM 1
 
     def lookup(self, symbol):
         """Return the value bound to SYMBOL. Errors if SYMBOL is not found."""
         # BEGIN PROBLEM 1
         "*** YOUR CODE HERE ***"
+        if symbol in self.bindings:
+            return self.bindings[symbol]
+        curr = self.parent
+        while curr is not None:
+            return curr.lookup(symbol) # This line must use return, otherwise lookup() will raise wrong error!
         # END PROBLEM 1
         raise SchemeError('unknown identifier: {0}'.format(symbol))
+    
 
+def make_child_frame(self, formals, vals):
+    """Return a new local frame whose parent is SELF, in which the symbols
+    in a Scheme list of formal parameters FORMALS are bound to the Scheme
+    values in the Scheme list VALS. Both FORMALS and VALS are represented
+    as Pairs. Raise an error if too many or too few vals are given.
 
-    def make_child_frame(self, formals, vals):
-        """Return a new local frame whose parent is SELF, in which the symbols
-        in a Scheme list of formal parameters FORMALS are bound to the Scheme
-        values in the Scheme list VALS. Both FORMALS and VALS are represented
-        as Pairs. Raise an error if too many or too few vals are given.
-
-        >>> env = create_global_frame()
-        >>> formals, expressions = read_line('(a b c)'), read_line('(1 2 3)')
-        >>> env.make_child_frame(formals, expressions)
-        <{a: 1, b: 2, c: 3} -> <Global Frame>>
-        """
-        if len(formals) != len(vals):
-            raise SchemeError('Incorrect number of arguments to function call')
-        # BEGIN PROBLEM 8
-        "*** YOUR CODE HERE ***"
-        # END PROBLEM 8
+    >>> env = create_global_frame()
+    >>> formals, expressions = read_line('(a b c)'), read_line('(1 2 3)')
+    >>> env.make_child_frame(formals, expressions)
+    <{a: 1, b: 2, c: 3} -> <Global Frame>>
+    """
+    if len(formals) != len(vals):
+        raise SchemeError('Incorrect number of arguments to function call')
+    # BEGIN PROBLEM 8
+    "*** YOUR CODE HERE ***"
+    # END PROBLEM 8
 
 ##############
 # Procedures #

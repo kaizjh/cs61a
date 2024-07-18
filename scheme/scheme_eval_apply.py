@@ -34,6 +34,11 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
     else:
         # BEGIN PROBLEM 3
         "*** YOUR CODE HERE ***"
+        procedure = scheme_eval(first, env)
+        # This helper function turn a two-arguments function into a one-argument function
+        def helper(expr1):
+            return scheme_eval(expr1, env)
+        return scheme_apply(procedure, rest.map(helper), env)
         # END PROBLEM 3
 
 def scheme_apply(procedure, args, env):
@@ -45,10 +50,21 @@ def scheme_apply(procedure, args, env):
     if isinstance(procedure, BuiltinProcedure):
         # BEGIN PROBLEM 2
         "*** YOUR CODE HERE ***"
+        args_list, curr = [], args
+        while curr is not nil:
+            args_list.append(curr.first)
+            curr = curr.rest
+        if procedure.need_env:
+            args_list.append(env)
         # END PROBLEM 2
         try:
             # BEGIN PROBLEM 2
             "*** YOUR CODE HERE ***"
+
+            # 在这里，* 用作参数解包操作符，*args_list 将 args_list 中的每个元素解包为独立的参数，再传参给py_func
+            # 然后就可以通过py_func(*args)接受，并进行如： return sum(args)等操作。
+            return procedure.py_func(*args_list)
+        
             # END PROBLEM 2
         except TypeError as err:
             raise SchemeError('incorrect number of arguments: {0}'.format(procedure))
