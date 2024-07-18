@@ -20,7 +20,7 @@ class nil:
 
 nil = nil() # Assignment hides the nil class; there is only one instance
 
-from helper.scalc import calc_apply
+from scalc import calc_apply
 def calc_eval(exp):
     """
     >>> calc_eval(Pair("define", Pair("a", Pair(1, nil))))
@@ -37,6 +37,8 @@ def calc_eval(exp):
             return eval_and(operands)
         elif operator == 'define': # define expressions
             return eval_define(operands)
+        elif operator == '//':
+            return floor_div(operands)
         else: # Call expressions
             return calc_apply(operator, operands) # UPDATE THIS FOR Q2
     elif exp in OPERATORS:   # Looking up procedures

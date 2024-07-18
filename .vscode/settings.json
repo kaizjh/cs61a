@@ -4,6 +4,7 @@
     "search.useGlobalIgnoreFiles": false,
     "python.analysis.extraPaths": [
         "./book",
-        "./book/34i"
+        "./book/34i",
+        "./work/helper"
     ]
 }
