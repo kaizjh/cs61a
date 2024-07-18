@@ -37,16 +37,14 @@ def calc_eval(exp):
             return eval_and(operands)
         elif operator == 'define': # define expressions
             return eval_define(operands)
-        elif operator == '//':
-            return floor_div(operands)
         else: # Call expressions
-            return calc_apply(operator, operands) # UPDATE THIS FOR Q2
+            return calc_apply(calc_eval(operator), operands.map(calc_eval)) # UPDATE THIS FOR Q2
     elif exp in OPERATORS:   # Looking up procedures
         return OPERATORS[exp]
     elif isinstance(exp, int) or isinstance(exp, bool):   # Numbers and booleans
         return exp
-    elif ...: # CHANGE THIS CONDITION FOR Q4
-        return ... # UPDATE THIS FOR Q4
+    elif exp in bindings: # CHANGE THIS CONDITION FOR Q4
+        return bindings[exp] # UPDATE THIS FOR Q4
 
 
 def floor_div(args):
@@ -71,9 +69,10 @@ def floor_div(args):
     "*** YOUR CODE HERE ***"
     assert isinstance(args, Pair), 'floor_div() takes in Pair instance'
     result = args.first
-    while args.rest is not nil:
-        result = result // args.rest.first
-        args = args.rest
+    divisors = args.rest
+    while divisors is not nil:
+        result = result // divisors.first
+        divisors = divisors.rest
     return result
 
 scheme_t = True   # Scheme's #t
@@ -97,8 +96,37 @@ def eval_and(expressions):
     True
     """
     "*** YOUR CODE HERE ***"
-    if expressions is nil:
-        return scheme_t
-    elif expressions is False:
-        return scheme_f
-    
+    curr = expressions
+    val = True
+    while curr is not nil:
+        val = calc_eval(curr.first)
+        if val is scheme_f:
+            return scheme_f
+        curr = curr.rest
+    return val
+
+
+
+
+bindings = {}
+
+def eval_define(expressions):
+    """
+    >>> eval_define(Pair("a", Pair(1, nil)))
+    'a'
+    >>> eval_define(Pair("b", Pair(3, nil)))
+    'b'
+    >>> eval_define(Pair("c", Pair("a", nil)))
+    'c'
+    >>> calc_eval("c")
+    1
+    >>> calc_eval(Pair("define", Pair("d", Pair("//", nil))))
+    'd'
+    >>> calc_eval(Pair("d", Pair(4, Pair(2, nil))))
+    2
+    """
+    "*** YOUR CODE HERE ***"
+    symbol = expressions.first
+    val = calc_eval(expressions.rest)
+    bindings[symbol] = val
+    return symbol
