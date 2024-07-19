@@ -43,22 +43,28 @@ class Frame:
         raise SchemeError('unknown identifier: {0}'.format(symbol))
     
 
-def make_child_frame(self, formals, vals):
-    """Return a new local frame whose parent is SELF, in which the symbols
-    in a Scheme list of formal parameters FORMALS are bound to the Scheme
-    values in the Scheme list VALS. Both FORMALS and VALS are represented
-    as Pairs. Raise an error if too many or too few vals are given.
+    def make_child_frame(self, formals, vals):
+        """Return a new local frame whose parent is SELF, in which the symbols
+        in a Scheme list of formal parameters FORMALS are bound to the Scheme
+        values in the Scheme list VALS. Both FORMALS and VALS are represented
+        as Pairs. Raise an error if too many or too few vals are given.
 
-    >>> env = create_global_frame()
-    >>> formals, expressions = read_line('(a b c)'), read_line('(1 2 3)')
-    >>> env.make_child_frame(formals, expressions)
-    <{a: 1, b: 2, c: 3} -> <Global Frame>>
-    """
-    if len(formals) != len(vals):
-        raise SchemeError('Incorrect number of arguments to function call')
-    # BEGIN PROBLEM 8
-    "*** YOUR CODE HERE ***"
-    # END PROBLEM 8
+        >>> env = create_global_frame()
+        >>> formals, expressions = read_line('(a b c)'), read_line('(1 2 3)')
+        >>> env.make_child_frame(formals, expressions)
+        <{a: 1, b: 2, c: 3} -> <Global Frame>>
+        """
+        if len(formals) != len(vals):
+            raise SchemeError('Incorrect number of arguments to function call')
+        # BEGIN PROBLEM 8
+        "*** YOUR CODE HERE ***"
+        frame = Frame(self)
+        formal, val = formals, vals
+        while formal is not nil:
+            frame.define(formal.first, val.first)
+            formal, val = formal.rest, val.rest
+        return frame
+        # END PROBLEM 8
 
 ##############
 # Procedures #
