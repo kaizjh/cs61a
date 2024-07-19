@@ -78,6 +78,15 @@ def scheme_apply(procedure, args, env):
     elif isinstance(procedure, MuProcedure):
         # BEGIN PROBLEM 11
         "*** YOUR CODE HERE ***"
+        # print(procedure, MuProcedure)   (mu (x) (+ x y)) <class 'scheme_classes.MuProcedure'>
+        # print(procedure.formals, procedure.body, args)      scm> (g 3 7)    (x) ((+ x y)) (6)
+        # We don't need make_child_frame() here, but we need to copy-paste some codes from make_child_frame()
+        # I don't think copy-paste is a good idea, but I don't know is there any other ways.
+        symbols,vals  = procedure.formals, args
+        while symbols is not nil:
+            env.define(symbols.first, vals.first)
+            symbols, vals = symbols.rest, vals.rest
+        return eval_all(procedure.body, env)
         # END PROBLEM 11
     else:
         assert False, "Unexpected procedure: {}".format(procedure)

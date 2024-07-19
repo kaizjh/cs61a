@@ -59,10 +59,10 @@ class Frame:
         # BEGIN PROBLEM 8
         "*** YOUR CODE HERE ***"
         frame = Frame(self)
-        formal, val = formals, vals
-        while formal is not nil:
-            frame.define(formal.first, val.first)
-            formal, val = formal.rest, val.rest
+        symbols, tmp_vals = formals, vals
+        while symbols is not nil:
+            frame.define(symbols.first, tmp_vals.first)
+            symbols, tmp_vals = symbols.rest, tmp_vals.rest
         return frame
         # END PROBLEM 8
 

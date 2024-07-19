@@ -127,6 +127,16 @@ def do_and_form(expressions, env):
     """
     # BEGIN PROBLEM 12
     "*** YOUR CODE HERE ***"
+    vals = expressions
+    if vals is nil:
+        return True
+    else:
+        while vals is not nil:
+            first = scheme_eval(vals.first, env)
+            if is_scheme_false(first):
+                return False
+            vals = vals.rest
+        return first
     # END PROBLEM 12
 
 def do_or_form(expressions, env):
@@ -145,6 +155,16 @@ def do_or_form(expressions, env):
     """
     # BEGIN PROBLEM 12
     "*** YOUR CODE HERE ***"
+    vals = expressions
+    if vals is nil:
+        return False
+    else:
+        while vals is not nil:
+            first = scheme_eval(vals.first, env)
+            if is_scheme_true(first):
+                return first
+            vals = vals.rest
+        return first
     # END PROBLEM 12
 
 def do_cond_form(expressions, env):
@@ -231,7 +251,8 @@ def do_mu_form(expressions, env):
     validate_formals(formals)
     # BEGIN PROBLEM 11
     "*** YOUR CODE HERE ***"
-    
+    # print(expressions)  scm> (define f (mu (x) (+ x y)))     ((x) (+ x y))
+    return MuProcedure(formals, expressions.rest)
     # END PROBLEM 11
 
 
