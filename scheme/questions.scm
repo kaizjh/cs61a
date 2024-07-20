@@ -7,8 +7,7 @@
 ;; Returns a list of two-element lists
 (define (enumerate s)
   ; BEGIN PROBLEM 15
-  'replace-this-line
-  )
+)
   ; END PROBLEM 15
 
 ;; Problem 16

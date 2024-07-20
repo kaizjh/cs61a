@@ -182,9 +182,14 @@ def do_cond_form(expressions, env):
                 raise SchemeError('else must be last')
         else:
             test = scheme_eval(clause.first, env)
+        # print(expressions, test) (((> 2 3) 5) ((> 2 4) 6) ((< 2 5) 7) (else 8)) False
         if is_scheme_true(test):
             # BEGIN PROBLEM 13
             "*** YOUR CODE HERE ***"
+            result = eval_all(clause.rest, env)
+            if result is None:
+                return test
+            return result
             # END PROBLEM 13
         expressions = expressions.rest
 
@@ -209,10 +214,16 @@ def make_let_frame(bindings, env):
     names = vals = nil
     # BEGIN PROBLEM 14
     "*** YOUR CODE HERE ***"
+    # print(bindings, bindings.first) ((x 5)) (x 5)
+    while bindings is not nil:
+        validate_form(bindings.first, 2, 2)
+        names = Pair(bindings.first.first, names)
+        vals = Pair(scheme_eval(bindings.first.rest.first, env), vals)
+        bindings = bindings.rest
+    validate_formals(names)
+    # print(names, vals)  (x) (5)     (x x) (2 2)
     # END PROBLEM 14
     return env.make_child_frame(names, vals)
-
-
 
 def do_quasiquote_form(expressions, env):
     """Evaluate a quasiquote form with parameters EXPRESSIONS in
