@@ -10,7 +10,7 @@
     (define (helper index s)
       (if (null? s)
         s
-        (list (list index (car s)) (helper (+ index 1) (cdr s)))
+        (cons (list index (car s)) (helper (+ index 1) (cdr s)))
       )
     )
     (helper 0 s)
