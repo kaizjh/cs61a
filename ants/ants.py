@@ -410,10 +410,11 @@ class TankAnt(ContainerAnt):
     def action(self, gamestate):
         if self.ant_contained:
             self.ant_contained.action(gamestate)
-        new_bees = list(self.place.bees)
-        for bee in new_bees:
-            bee.reduce_health(self.damage)
-        self.place.bees = [bee for bee in new_bees if bee.health > 0]        
+        if self.place != None:
+            new_bees = list(self.place.bees)
+            for bee in new_bees:
+                bee.reduce_health(self.damage)
+            self.place.bees = [bee for bee in new_bees if bee.health > 0]
 # END Problem 9
 
 
@@ -538,29 +539,26 @@ class LaserAnt(ThrowerAnt):
 
     def insects_in_front(self):
         # BEGIN Problem Optional 2
-        insect, distance = {}, 0
-        place = self.place
-        
-        # Base case, LaserAnt's place
-        if place.ant.is_container:
-            insect[place.ant] = distance
-        if place.bees:
-            for bee in place.bees:
-                insect[bee] = distance
-        # From next place all along to the hive
-        while True:
-            place = place.entrance
-            distance += 1
-            if place.is_hive:
-                break
-            else:
-                if place.bees:
-                    for bee in place.bees:
-                        insect[bee] = distance
+        print(0)
+        all_insects_in_front_with_distance = {}
+        distance = 0
+        current_place = self.place
+        print(1, current_place)
+        while current_place.is_hive == False:
+            print(2, current_place, current_place.bees)
+            for bee in current_place.bees:
+                print(3, current_place, current_place.bees)
+                all_insects_in_front_with_distance[bee] = distance
+                print(4, current_place, current_place.bees)
+            if current_place.ant != None and current_place.ant != self:
+                if current_place.ant.is_container == True and current_place.ant.ant_contained == True:
+                    all_insects_in_front_with_distance[current_place.ant.ant_contained] = distance
+                all_insects_in_front_with_distance[current_place.ant] = distance
+            distance = distance + 1
 
-                if place.ant:
-                    insect[place.ant] = distance
-        return insect
+            current_place = current_place.entrance
+
+        return all_insects_in_front_with_distance
         # END Problem Optional 2
 
     def calculate_damage(self, distance):

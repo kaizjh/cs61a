@@ -56,3 +56,75 @@
 (define (even-subsets2 s)
     (filter (lambda (s) (even? (apply + s))) (nonempty-subsets s)) ; (apply + s) means apply addition(+) to list s
 )
+
+
+
+
+(define-syntax check
+    (syntax-rules ()
+      ((_ expr)
+       (if expr 'passed 'failed))))
+
+(define-syntax check
+    (syntax-rules ()
+      ((_ expr)
+       (list 'if expr ''passed ''failed))))
+
+(define-syntax check
+    (syntax-rules ()
+      ((_ expr)
+       (if expr 'passed 
+                '(failed: expr)))))
+
+(define x 2)
+
+
+(define (map fn vals)
+    (if (null? vals)
+        '()
+        (cons (fn (car vals))
+              (map fn (cdr vals))
+        )
+    )
+)
+
+(define-syntax for
+    (syntax-rules ()
+        ((_ sym vals expr)
+         (map (lambda (sym) expr) vals)
+        )
+    )
+)
+(define y (for x '(2 3 4 5) (* x x)))
+
+
+
+
+(define fact (lambda (n)
+    (if (zero? n) 1 (* n (fact (- n 1))))))
+
+(define original fact)
+(define fact (lambda (n)
+             (display (list 'fact n))
+             (original n)))
+
+
+(define-macro (trace expr) ; (trace (fact 5))
+    (define operator (car expr)) ; fact
+    `(begin
+        (define original ,operator)
+        (define ,operator (lambda (n)
+                            (print (list ',operator n))
+                            (original n)))
+        (define result ,expr)
+        (define ,operator original)
+        result
+    )
+)
+
+(define fact (lambda (n)
+                (if (zero? n) 1 (* n (fact (- n 1))))))
+
+(fact 5)
+(trace (fact 5))
+(fact 5)

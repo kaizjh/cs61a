@@ -35,10 +35,8 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
         # BEGIN PROBLEM 3
         "*** YOUR CODE HERE ***"
         procedure = scheme_eval(first, env)
-        # This helper function turn a two-arguments function into a one-argument function
-        def helper(expr1):
-            return scheme_eval(expr1, env)
-        return scheme_apply(procedure, rest.map(helper), env)
+        args = rest.map(lambda operand: scheme_eval(operand, env))
+        return scheme_apply(procedure, args, env)
         # END PROBLEM 3
 
 def scheme_apply(procedure, args, env):
