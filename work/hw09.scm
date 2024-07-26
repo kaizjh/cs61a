@@ -1,3 +1,8 @@
+(define (curry-cook formals body)
+    (if (null? formals)
+        body
+        `(lambda (,(car formals)) ,(curry-cook (cdr formals) body))
+    ))
 
 (define-macro (trace expr) ; (trace (fact 5))
     (define operator (car expr)) ; fact

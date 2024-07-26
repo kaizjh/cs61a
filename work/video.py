@@ -328,6 +328,7 @@ class Tree:
     def is_leaf(self):
         return not self.branches
 
+
 def fib_tree(n):
     if n == 0 or n == 1:
         return Tree(n)
@@ -555,6 +556,33 @@ def delete(t, x):
 
 t = Tree(1, [Tree(3, [Tree(6), Tree(2)]), Tree(4)])
 delete(t, 2)
+print("________________________________________")
 
 
 
+
+"""
+import sqlite3
+db = sqlite3.Connection("video.db")
+db.execute("CREATE TABLE nums AS SELECT 2 UNION SELECT 3;")
+db.execute("INSERT INTO nums VALUES (?), (?), (?);", range(4, 7))
+print(db.execute("SELECT * FROM nums;").fetchall())
+db.commit()
+"""
+
+
+
+def bigs(t):
+    """Return the number of nodes in t that are larger thatn all their ancestors.
+    >>> a = Tree(1, [Tree(4, [Tree(4), Tree(5)]), Tree(3, [Tree(0, [Tree(2)])])])
+    >>> bigs(a)
+    4
+    >>> b = Tree(1, [Tree(3, [Tree(22), Tree(1)]), Tree(2, [Tree(34, [Tree(2)])])])
+    >>> bigs(b)
+    5
+    """
+    assert isinstance(t, Tree)
+    if t.is_leaf == True:
+        return 1
+    else:
+        return 1 + sum([bigs(b) for b in t.branches if b.label > t.label])

@@ -10,7 +10,7 @@ import scheme_forms
 # Eval/Apply #
 ##############
 
-def scheme_eval(expr, env, _=None): # Optional third argument is ignored
+def scheme_eval(expr, env, tail=False): # Optional third argument is ignored
     """Evaluate Scheme expression EXPR in Frame ENV.
 
     >>> expr = read_line('(+ 2 2)')
@@ -36,7 +36,10 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
         "*** YOUR CODE HERE ***"
         procedure = scheme_eval(first, env)
         args = rest.map(lambda operand: scheme_eval(operand, env))
-        return scheme_apply(procedure, args, env)
+        if tail:
+            return Unevaluated(Pair(procedure, args), env)
+        else:
+            return scheme_apply(procedure, args, env)
         # END PROBLEM 3
 
 def scheme_apply(procedure, args, env):
@@ -108,7 +111,7 @@ def eval_all(expressions, env):
     curr = expressions
     result = None
     while curr is not nil:
-        result = scheme_eval(curr.first, env)
+        result = scheme_eval(curr.first, env, tail=(curr.rest is nil))
         curr = curr.rest
     return result
     # END PROBLEM 6
@@ -130,10 +133,9 @@ def complete_apply(procedure, args, env):
     """Apply procedure to args in env; ensure the result is not an Unevaluated."""
     validate_procedure(procedure)
     val = scheme_apply(procedure, args, env)
-    if isinstance(val, Unevaluated):
+    while isinstance(val, Unevaluated):
         return scheme_eval(val.expr, val.env)
-    else:
-        return val
+    return val
 
 def optimize_tail_calls(unoptimized_scheme_eval):
     """Return a properly tail recursive version of an eval function."""
@@ -153,21 +155,8 @@ def optimize_tail_calls(unoptimized_scheme_eval):
         # END OPTIONAL PROBLEM 1
     return optimized_eval
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ################################################################
 # Uncomment the following line to apply tail call optimization #
 ################################################################
 # optimize_tail_calls() is a decorator of scheme_eval()
-# scheme_eval = optimize_tail_calls(scheme_eval)
+scheme_eval = optimize_tail_calls(scheme_eval)
