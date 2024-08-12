@@ -1,4 +1,7 @@
-"""A Scheme interpreter and its read-eval-print loop."""
+"""
+A Scheme interpreter and its read-eval-print loop.
+usage: python3 scheme.py
+"""
 
 import sys
 import os
